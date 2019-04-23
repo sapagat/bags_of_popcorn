@@ -8,7 +8,9 @@ try:
 except LookupError:
     nltk.download('stopwords')
 from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
 
+MOST_FREQUENT = 5000
 HEADER_ROW = 0
 DELIMITER = '\t'
 
@@ -55,3 +57,16 @@ def filter_stopwords(words, stopwords):
 
         result.append(word)
     return result
+
+def build_bag_of_words(texts):
+    vectorizer = CountVectorizer(
+        analyzer = "word",
+        tokenizer = None,
+        preprocessor = None,
+        stop_words = None,
+        max_features = MOST_FREQUENT
+    )
+    return {
+        'features': vectorizer.fit_transform(texts).toarray(),
+        'vocabulary': vectorizer.get_feature_names()
+    }
