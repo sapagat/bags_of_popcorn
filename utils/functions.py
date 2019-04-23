@@ -9,7 +9,9 @@ except LookupError:
     nltk.download('stopwords')
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.ensemble import RandomForestClassifier
 
+NUMBER_OF_TREES=100
 MOST_FREQUENT = 5000
 HEADER_ROW = 0
 DELIMITER = '\t'
@@ -20,6 +22,18 @@ def read_dataset(name):
         path,
         header=HEADER_ROW,
         delimiter=DELIMITER,
+        quoting=csv.QUOTE_NONE
+    )
+
+def write_output(name, ids, sentiments):
+    path = 'out/' + name
+    output = pd.DataFrame(data={
+        'id': ids,
+        'sentiment': sentiments
+    })
+    output.to_csv(
+        path,
+        index=False,
         quoting=csv.QUOTE_NONE
     )
 
@@ -68,5 +82,10 @@ def build_bag_of_words(texts):
     )
     return {
         'features': vectorizer.fit_transform(texts).toarray(),
-        'vocabulary': vectorizer.get_feature_names()
+        'vocabulary': vectorizer.get_feature_names(),
+        'vectorizer': vectorizer
     }
+
+def train_random_forest(features, labels):
+    forest = RandomForestClassifier(n_estimators = NUMBER_OF_TREES)
+    return forest.fit(features, labels)
